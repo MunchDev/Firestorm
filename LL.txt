@@ -1,0 +1,54 @@
+program     :   stmts
+
+    stmts       :   stmt SEMICOLON
+                |   stmt SEMICOLON stmts
+
+        stmt        :   tlo_stmt
+                    |   otr_stmt
+
+            tlo_stmt    :   extern_stmt
+                        :   define_stmt
+
+                extern_stmt :   EXTERN proto
+
+                    proto       :   ID LPAREN ids RPAREN
+
+                        ids         :
+                                    |   ID
+                                    |   ID COMMA ids
+
+                define_stmt :   DEFINE proto expr
+
+            otr_stmt    :   expr
+
+                expr        :   primary
+                            |   primary bin_op_rhs
+
+                    bin_op_rhs  :   op primary
+                                |   op primary bin_op_rhs
+
+                        op          :   PLUS
+                                    |   MINUS
+                                    |   TIMES
+                                    |   DIVIDE
+                                    |   EQL
+                                    |   NEQ
+                                    |   GTE
+                                    |   LTE
+                                    |   GT
+                                    |   LT
+
+                        primary     :   num_expr
+                                    |   id_expr
+                                    |   paren_expr
+
+                            num_expr    :   NUMBER
+
+                            id_expr     :   ID
+                                        |   ID LPAREN args RPAREN
+
+                                    args        :
+                                                |   expr
+                                                |   expr COMMA args
+
+                            paren_expr  :   LPAREN expr RPAREN
