@@ -29,7 +29,7 @@ void loop_output_ir() {
             previousToken = stream.currentToken;
 
             // Print IR
-            for (const auto& stmt: program) {
+            for (const auto &stmt: program) {
                 auto IR = stmt->generateIR();
                 IR->print(llvm::outs());
                 llvm::outs() << '\n';

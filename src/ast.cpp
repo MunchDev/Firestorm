@@ -9,32 +9,32 @@
 
 using fmt::format;
 
-CodeGenerator& getCodegen() {
+CodeGenerator &getCodegen() {
     static CodeGenerator codegen;
     return codegen;
 }
 
-auto& Context() {
+auto &Context() {
     return getCodegen().context;
 }
 
-auto& Builder() {
+auto &Builder() {
     return getCodegen().builder;
 }
 
-auto& Module() {
+auto &Module() {
     return getCodegen().module;
 }
 
-auto& PassManager() {
+auto &PassManager() {
     return getCodegen().passManager;
 }
 
-auto& NamedValues() {
+auto &NamedValues() {
     return getCodegen().namedValues;
 }
 
-const auto& DoubleType() {
+const auto &DoubleType() {
     static auto t = llvm::Type::getDoubleTy(*Context());
     return t;
 }

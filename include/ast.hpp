@@ -62,8 +62,9 @@ struct VariableExpr : public Expr {
 
 struct IfExpr : public Expr {
     ExprPtr condition_clause, then_clause, else_clause;
+
     IfExpr(ExprPtr c, ExprPtr t, ExprPtr e)
-    : condition_clause(std::move(c)), then_clause(std::move(t)), else_clause(std::move(e)) {}
+            : condition_clause(std::move(c)), then_clause(std::move(t)), else_clause(std::move(e)) {}
 
     [[nodiscard]]
     std::string toString() const override;
