@@ -206,3 +206,14 @@ llvm::Value *Function::generateIR() const {
     func->removeFromParent();
     return nullptr;
 }
+
+std::string IfExpr::toString() const {
+    auto i = condition_clause->toString();
+    auto t = then_clause->toString();
+    auto e = else_clause->toString();
+    return fmt::format("Conditional(if={}, then={}, else={})", i, t, e);
+}
+
+llvm::Value *IfExpr::generateIR() const {
+    return nullptr;
+}
