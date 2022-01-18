@@ -7,6 +7,7 @@
 
 #include "lexer.hpp"
 
+[[maybe_unused]]
 std::string Token::toString() const {
     std::string msg = "Token(name={}, value={}, index={}, lineno={}, colno={})";
     return fmt::format(msg, name, value, position.index, position.lineno, position.colno);

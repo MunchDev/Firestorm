@@ -78,7 +78,7 @@ struct Token {
     std::string value;
     SourcePosition position;
 
-    [[nodiscard]]
+    [[maybe_unused]] [[nodiscard]]
     std::string toString() const;
 
     [[nodiscard]]
