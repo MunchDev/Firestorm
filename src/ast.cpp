@@ -34,6 +34,11 @@ auto& NamedValues() {
     return getCodegen().namedValues;
 }
 
+const auto& DoubleType() {
+    static auto t = llvm::Type::getDoubleTy(*Context());
+    return t;
+}
+
 std::string NumberExpr::toString() const {
     return format("Number({})", value);
 }
@@ -75,10 +80,10 @@ llvm::Value *BinaryExpr::generateIR() const {
         return Builder()->CreateFDiv(lhs_code, rhs_code, "div_tmp");
     else if (op == "==") {
         lhs_code = Builder()->CreateICmpEQ(lhs_code, rhs_code, "cmp_eq_tmp");
-        return Builder()->CreateUIToFP(lhs_code, llvm::Type::getDoubleTy(*Context()), "bool_tmp");
+        return Builder()->CreateUIToFP(lhs_code, DoubleType(), "bool_tmp");
     } else if (op == "<") {
         lhs_code = Builder()->CreateFCmpULE(lhs_code, rhs_code, "cmp_lt_tmp");
-        return Builder()->CreateUIToFP(lhs_code, llvm::Type::getDoubleTy(*Context()), "bool_tmp");
+        return Builder()->CreateUIToFP(lhs_code, DoubleType(), "bool_tmp");
     } else {
         throw CodegenError(fmt::format("Invalid binary operator, found '{}'", op).c_str());
     }
@@ -129,16 +134,14 @@ std::string Prototype::toString() const {
 }
 
 llvm::Function *Prototype::generateIR() const {
-    auto double_type = llvm::Type::getDoubleTy(*Context());
-
     // Make argument types
     // Firestorm only supports values that are doubles
     // Hence, arguments of all proto has the form (double, ...)
-    std::vector<llvm::Type *> args_type{args.size(), double_type};
+    std::vector<llvm::Type *> args_type{args.size(), DoubleType()};
 
     // Make function type here
     // Similarly, the return type is double
-    auto func_type = llvm::FunctionType::get(double_type, args_type, false);
+    auto func_type = llvm::FunctionType::get(DoubleType(), args_type, false);
 
     auto func = llvm::Function::Create(func_type, llvm::Function::ExternalLinkage,
                                        name, Module().get());
