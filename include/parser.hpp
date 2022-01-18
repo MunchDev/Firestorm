@@ -99,6 +99,7 @@ private:
     // primary      :=  num_expr
     //              :=  id_expr
     //              :=  paren_expr
+    //              :=  if_expr
     ExprPtr parsePrimary();
 
     // num_expr     :=  NUMBER
@@ -114,6 +115,9 @@ private:
 
     // paren_expr   :=  LPAREN expr RPAREN
     ExprPtr parseParenExpr();
+
+    // if_expr      :=  IF expr THEN expr ELSE expr
+    ExprPtr parseIfExpr();
 
     // Util method for bin_op_rhs
     int getOperatorPrecedence();

@@ -14,6 +14,47 @@ int Parser::getOperatorPrecedence() {
     return -1;
 }
 
+ExprPtr Parser::parseIfExpr() {
+    // Consume IF token
+    stream.getNextToken();
+
+    // Parse condition_clause
+    auto cond = parseExpr();
+    if (!cond) return nullptr;
+
+    // Check for and consume THEN token
+    if (stream.currentToken.name != "THEN") {
+        std::string msg = "[{}:{}] Expected 'then' followed, found '{}'";
+        auto l = stream.currentToken.position.lineno;
+        auto c = stream.currentToken.position.colno;
+        auto v = stream.currentToken.value;
+        msg = fmt::format(msg, l, c, v);
+        throw LexingError(msg.c_str());
+    }
+    stream.getNextToken();
+
+    // Parse then_clause
+    auto then = parseExpr();
+    if (!then) return nullptr;
+
+    // Check for and consume ELSE token
+    if (stream.currentToken.name != "ELSE") {
+        std::string msg = "[{}:{}] Expected 'else' followed, found '{}'";
+        auto l = stream.currentToken.position.lineno;
+        auto c = stream.currentToken.position.colno;
+        auto v = stream.currentToken.value;
+        msg = fmt::format(msg, l, c, v);
+        throw LexingError(msg.c_str());
+    }
+    stream.getNextToken();
+
+    // Parse then_clause
+    auto _else = parseExpr();
+    if (!_else) return nullptr;
+
+    return std::make_unique<IfExpr>(std::move(cond), std::move(then), std::move(_else));
+}
+
 ExprPtr Parser::parseNumExpr() {
     // Convert token value to double
     auto value = std::strtod(stream.currentToken.value.c_str(), nullptr);
@@ -99,6 +140,8 @@ ExprPtr Parser::parsePrimary() {
         return parseParenExpr();
     } else if (name == "ID") {
         return parseIdExpr();
+    } else if (name == "IF") {
+        return parseIfExpr();
     } else {
         std::string msg = "[{}:{}] Expression expected, found '{}'";
         auto l = stream.currentToken.position.lineno;
