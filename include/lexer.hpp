@@ -28,10 +28,9 @@ namespace {
 
         // I. Keywords
         // 1. If statement
-//    rule_set.emplace_back("IF", std::regex("^if"));
-//    rule_set.emplace_back("THEN", std::regex("^then"));
-//    rule_set.emplace_back("ELSE", std::regex("^else"));
-//    rule_set.emplace_back("END", std::regex("^end"));
+        rule_set.emplace_back("IF", std::regex("^if"));
+        rule_set.emplace_back("THEN", std::regex("^then"));
+        rule_set.emplace_back("ELSE", std::regex("^else"));
 
         // 2. While loop
 //    rule_set.emplace_back("WHILE", std::regex("^while"));
