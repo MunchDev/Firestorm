@@ -218,5 +218,56 @@ std::string IfExpr::toString() const {
 }
 
 llvm::Value *IfExpr::generateIR() const {
-    return nullptr;
+    // codegen condition_clause
+    auto cond_code = condition_clause->generateIR();
+    if (!cond_code) return nullptr;
+
+    // Convert cond_code to bool by comparing with zero
+    // Here we utilise NumberExpr
+    auto zero_code = NumberExpr(0).generateIR();
+    cond_code = Builder()->CreateFCmpONE(cond_code, zero_code, "if_cond");
+
+    auto func = Builder()->GetInsertBlock()->getParent();
+
+    // Generate blocks for then, else, if_cont (merging then and else)
+    auto then_block = llvm::BasicBlock::Create(*Context(), "then", func);
+    auto else_block = llvm::BasicBlock::Create(*Context(), "else");
+    auto cont_block = llvm::BasicBlock::Create(*Context(), "if_cont");
+
+    // Create conditional branch
+    Builder()->CreateCondBr(cond_code, then_block, else_block);
+
+    // codegen then_code to insert to then_block
+    Builder()->SetInsertPoint(then_block);
+    auto then_code = then_clause->generateIR();
+    if (!then_code) return nullptr;
+
+    // Make cont_block a branch from then_block
+    // This is necessary because later, else_block will also branch to cont_block
+    // NOTE: LLVM strictly require all branch to terminate explicitly
+    Builder()->CreateBr(cont_block);
+
+    // codegen of then_clause could change block
+    // Hence, we need to retrieve it
+    then_block = Builder()->GetInsertBlock();
+
+    // codegen else_code to insert to else_code
+    // But first add else_block to func
+    func->getBasicBlockList().push_back(else_block);
+    Builder()->SetInsertPoint(else_block);
+    auto else_code = else_clause->generateIR();
+    if (!else_code) return nullptr;
+
+    // codegen of else_code
+    else_block = Builder()->GetInsertBlock();
+
+    // Now insert cont_block into function
+    func->getBasicBlockList().push_back(cont_block);
+    Builder()->SetInsertPoint(cont_block);
+
+    // Make PHI node
+    auto phi = Builder()->CreatePHI(DoubleType(), 2, "if_tmp");
+    phi->addIncoming(then_code, then_block);
+    phi->addIncoming(else_code, else_block);
+    return phi;
 }
