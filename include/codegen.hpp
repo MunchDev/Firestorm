@@ -21,10 +21,10 @@ struct Expr;
 using ExprPtr = std::unique_ptr<Expr>;
 
 struct CodeGenerator {
-    std::unique_ptr<llvm::LLVMContext> context;
-    std::unique_ptr<llvm::IRBuilder<>> builder;
-    std::unique_ptr<llvm::Module> module;
-    std::unique_ptr<llvm::legacy::FunctionPassManager> passManager;
+    llvm::LLVMContext context;
+    llvm::IRBuilder<> builder;
+    llvm::Module module;
+    llvm::legacy::FunctionPassManager passManager;
     std::map<std::string, llvm::Value *> namedValues;
 
 

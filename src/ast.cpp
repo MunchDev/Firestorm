@@ -35,7 +35,7 @@ auto &NamedValues() {
 }
 
 const auto &DoubleType() {
-    static auto t = llvm::Type::getDoubleTy(*Context());
+    static auto t = llvm::Type::getDoubleTy(Context());
     return t;
 }
 
@@ -44,7 +44,7 @@ std::string NumberExpr::toString() const {
 }
 
 llvm::Value *NumberExpr::generateIR() const {
-    return llvm::ConstantFP::get(*Context(), llvm::APFloat(value));
+    return llvm::ConstantFP::get(Context(), llvm::APFloat(value));
 }
 
 std::string VariableExpr::toString() const {
@@ -71,19 +71,19 @@ llvm::Value *BinaryExpr::generateIR() const {
     auto rhs_code = rhs->generateIR();
 
     if (op == "+")
-        return Builder()->CreateFAdd(lhs_code, rhs_code, "add_tmp");
+        return Builder().CreateFAdd(lhs_code, rhs_code, "add_tmp");
     else if (op == "-")
-        return Builder()->CreateFSub(lhs_code, rhs_code, "sub_tmp");
+        return Builder().CreateFSub(lhs_code, rhs_code, "sub_tmp");
     else if (op == "*")
-        return Builder()->CreateFMul(lhs_code, rhs_code, "mul_tmp");
+        return Builder().CreateFMul(lhs_code, rhs_code, "mul_tmp");
     else if (op == "/")
-        return Builder()->CreateFDiv(lhs_code, rhs_code, "div_tmp");
+        return Builder().CreateFDiv(lhs_code, rhs_code, "div_tmp");
     else if (op == "==") {
-        lhs_code = Builder()->CreateICmpEQ(lhs_code, rhs_code, "cmp_eq_tmp");
-        return Builder()->CreateUIToFP(lhs_code, DoubleType(), "bool_tmp");
+        lhs_code = Builder().CreateICmpEQ(lhs_code, rhs_code, "cmp_eq_tmp");
+        return Builder().CreateUIToFP(lhs_code, DoubleType(), "bool_tmp");
     } else if (op == "<") {
-        lhs_code = Builder()->CreateFCmpULE(lhs_code, rhs_code, "cmp_lt_tmp");
-        return Builder()->CreateUIToFP(lhs_code, DoubleType(), "bool_tmp");
+        lhs_code = Builder().CreateFCmpULE(lhs_code, rhs_code, "cmp_lt_tmp");
+        return Builder().CreateUIToFP(lhs_code, DoubleType(), "bool_tmp");
     } else {
         throw CodegenError(fmt::format("Invalid binary operator, found '{}'", op).c_str());
     }
@@ -103,7 +103,7 @@ std::string CallExpr::toString() const {
 
 llvm::Value *CallExpr::generateIR() const {
     // Look up function
-    auto func = Module()->getFunction(callee);
+    auto func = Module().getFunction(callee);
 
     if (!func) {
         throw CodegenError(fmt::format("Unknown function '{}'", callee).c_str());
@@ -124,7 +124,7 @@ llvm::Value *CallExpr::generateIR() const {
         if (!args_code.back()) return nullptr;
     }
 
-    return Builder()->CreateCall(func, args_code);
+    return Builder().CreateCall(func, args_code);
 }
 
 std::string Prototype::toString() const {
@@ -144,7 +144,7 @@ llvm::Function *Prototype::generateIR() const {
     auto func_type = llvm::FunctionType::get(DoubleType(), args_type, false);
 
     auto func = llvm::Function::Create(func_type, llvm::Function::ExternalLinkage,
-                                       name, Module().get());
+                                       name, Module());
 
     // Set names for easy reference
     unsigned idx = 0;
@@ -162,7 +162,7 @@ std::string Function::toString() const {
 
 llvm::Value *Function::generateIR() const {
     // Check for existing function
-    auto func = Module()->getFunction(proto->name);
+    auto func = Module().getFunction(proto->name);
 
     // If function not found, i.e. not yet declared, defined
     // then codegen its proto
@@ -179,8 +179,8 @@ llvm::Value *Function::generateIR() const {
 
     // Create a basic block for function, i.e. function body
     // SetInsertPoint to specify that instructions shall be appended to block
-    auto block = llvm::BasicBlock::Create(*Context(), "entry", func);
-    Builder()->SetInsertPoint(block);
+    auto block = llvm::BasicBlock::Create(Context(), "entry", func);
+    Builder().SetInsertPoint(block);
 
     // Record function arguments
     NamedValues().clear();
@@ -191,13 +191,13 @@ llvm::Value *Function::generateIR() const {
     // Implement function body
     if (auto body_code = body->generateIR()) {
         // Create return value
-        Builder()->CreateRet(body_code);
+        Builder().CreateRet(body_code);
 
         // Verify function well-formed-ness
         llvm::verifyFunction(*func);
 
         // Perform optimisation
-        PassManager()->run(*func);
+        PassManager().run(*func);
 
         return func;
     }
@@ -225,48 +225,48 @@ llvm::Value *IfExpr::generateIR() const {
     // Convert cond_code to bool by comparing with zero
     // Here we utilise NumberExpr
     auto zero_code = NumberExpr(0).generateIR();
-    cond_code = Builder()->CreateFCmpONE(cond_code, zero_code, "if_cond");
+    cond_code = Builder().CreateFCmpONE(cond_code, zero_code, "if_cond");
 
-    auto func = Builder()->GetInsertBlock()->getParent();
+    auto func = Builder().GetInsertBlock()->getParent();
 
     // Generate blocks for then, else, if_cont (merging then and else)
-    auto then_block = llvm::BasicBlock::Create(*Context(), "then", func);
-    auto else_block = llvm::BasicBlock::Create(*Context(), "else");
-    auto cont_block = llvm::BasicBlock::Create(*Context(), "if_cont");
+    auto then_block = llvm::BasicBlock::Create(Context(), "then", func);
+    auto else_block = llvm::BasicBlock::Create(Context(), "else");
+    auto cont_block = llvm::BasicBlock::Create(Context(), "if_cont");
 
     // Create conditional branch
-    Builder()->CreateCondBr(cond_code, then_block, else_block);
+    Builder().CreateCondBr(cond_code, then_block, else_block);
 
     // codegen then_code to insert to then_block
-    Builder()->SetInsertPoint(then_block);
+    Builder().SetInsertPoint(then_block);
     auto then_code = then_clause->generateIR();
     if (!then_code) return nullptr;
 
     // Make cont_block a branch from then_block
     // This is necessary because later, else_block will also branch to cont_block
     // NOTE: LLVM strictly require all branch to terminate explicitly
-    Builder()->CreateBr(cont_block);
+    Builder().CreateBr(cont_block);
 
     // codegen of then_clause could change block
     // Hence, we need to retrieve it
-    then_block = Builder()->GetInsertBlock();
+    then_block = Builder().GetInsertBlock();
 
     // codegen else_code to insert to else_code
     // But first add else_block to func
     func->getBasicBlockList().push_back(else_block);
-    Builder()->SetInsertPoint(else_block);
+    Builder().SetInsertPoint(else_block);
     auto else_code = else_clause->generateIR();
     if (!else_code) return nullptr;
 
     // codegen of else_code
-    else_block = Builder()->GetInsertBlock();
+    else_block = Builder().GetInsertBlock();
 
     // Now insert cont_block into function
     func->getBasicBlockList().push_back(cont_block);
-    Builder()->SetInsertPoint(cont_block);
+    Builder().SetInsertPoint(cont_block);
 
     // Make PHI node
-    auto phi = Builder()->CreatePHI(DoubleType(), 2, "if_tmp");
+    auto phi = Builder().CreatePHI(DoubleType(), 2, "if_tmp");
     phi->addIncoming(then_code, then_block);
     phi->addIncoming(else_code, else_block);
     return phi;

@@ -11,20 +11,15 @@
 
 #include "codegen.hpp"
 
-CodeGenerator::CodeGenerator() {
-    context = std::make_unique<llvm::LLVMContext>();
-    module = std::make_unique<llvm::Module>("Main", *context);
-    builder = std::make_unique<llvm::IRBuilder<>>(*context);
-    passManager = std::make_unique<llvm::legacy::FunctionPassManager>(module.get());
-
+CodeGenerator::CodeGenerator() : context(), builder(context), module("Main", context),
+                                 passManager(&module) {
     // Do simple "peephole" optimizations and bit-twiddling options.
-    passManager->add(llvm::createInstructionCombiningPass());
+    passManager.add(llvm::createInstructionCombiningPass());
     // Re-associate expressions.
-    passManager->add(llvm::createReassociatePass());
+    passManager.add(llvm::createReassociatePass());
     // Eliminate Common SubExpressions.
-    passManager->add(llvm::createGVNPass());
+    passManager.add(llvm::createGVNPass());
     // Simplify the control flow graph (deleting unreachable blocks, etc).
-    passManager->add(llvm::createCFGSimplificationPass());
-
-    passManager->doInitialization();
+    passManager.add(llvm::createCFGSimplificationPass());
+    passManager.doInitialization();
 }

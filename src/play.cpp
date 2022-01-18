@@ -39,5 +39,5 @@ void loop_output_ir() {
         }
     }
     // Print the entire module
-    getCodegen().module->print(llvm::outs(), nullptr);
+    getCodegen().module.print(llvm::outs(), nullptr);
 }
