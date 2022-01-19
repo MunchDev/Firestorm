@@ -44,7 +44,7 @@ namespace Firestorm::Lexing {
 
     /// Creates lexing rule sets for Firestorm's lexer.
     /// @return The regular expression ruleset for Firestorm
-    static const std::vector<std::pair<Type, std::regex>> &getRuleSet();
+    const std::vector<std::pair<Type, std::regex>> &getRuleSet();
 
     /// @brief Consists of a single token extracted from source.
     struct Token {
