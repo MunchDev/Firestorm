@@ -14,7 +14,7 @@ namespace Firestorm::Parsing {
         auto l = token.position.lineno;
         auto c = token.position.colno;
         auto v = token.value;
-        return Utility::getError(msg, l, c, v);
+        return Utility::getError(Utility::PE, msg, l, c, v);
     }
 
     int Parser::getOperatorPrecedence() {

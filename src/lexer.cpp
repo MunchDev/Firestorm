@@ -122,7 +122,7 @@ namespace Firestorm::Lexing {
             }
         }
         // Throw an error when source doesn't match any rules
-        throw Utility::getError("[{}:{}] Unknown character '{}'", lineno, colno, sub_str[0]);
+        throw Utility::getError(Utility::LE, "[{}:{}] Unknown character '{}'", lineno, colno, sub_str[0]);
     }
 
     void TokenStream::updateSourcePos() {
