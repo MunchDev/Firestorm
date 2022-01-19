@@ -17,7 +17,7 @@ void loop_output_ir() {
     std::string input;
 
     while (true) {
-        std::cout.flush() << "Input> ";
+        llvm::outs() << "Input> ";
 
         std::getline(std::cin, input);
         if (input == "=exit") break;
