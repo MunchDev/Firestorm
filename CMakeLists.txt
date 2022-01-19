@@ -15,21 +15,19 @@ separate_arguments(LLVM_DEFINITIONS_LIST NATIVE_COMMAND ${LLVM_DEFINITIONS})
 add_definitions(${LLVM_DEFINITIONS_LIST})
 llvm_map_components_to_libnames(LLVM_LIBS core orcjit native)
 
-include_directories(
-    ${CMAKE_CURRENT_SOURCE_DIR}/include
-)
+include_directories(include)
 
 add_library(Firestorm
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/ast.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/codegen.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/lexer.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/parser.cpp
+    src/custom_exceptions.cpp
+    src/codegen.cpp
+    src/lexer.cpp
+    src/ast.cpp
+    src/parser.cpp
     )
-target_link_libraries(Firestorm fmt::fmt)
-target_link_libraries(Firestorm ${LLVM_LIBS})
+target_link_libraries(Firestorm PUBLIC fmt::fmt ${LLVM_LIBS})
 
 add_executable(FirestormMain
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/play.cpp
+    src/main.cpp
+    src/play.cpp
     )
-target_link_libraries(FirestormMain Firestorm)
+target_link_libraries(FirestormMain PUBLIC Firestorm)
