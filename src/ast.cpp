@@ -198,7 +198,9 @@ namespace Firestorm::AST {
             llvm::verifyFunction(*func);
 
             // Perform optimisation
-            Optimiser().passManager.run(*func, Optimiser().analysisManager);
+            // Notes: Temporary remove optimiser since its API is changing
+            // and no one knows how to use the new one.
+            // Optimiser().passManager.run(*func, Optimiser().analysisManager);
 
             return func;
         }
