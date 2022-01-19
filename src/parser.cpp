@@ -23,7 +23,7 @@ ExprPtr Parser::parseIfExpr() {
     if (!cond) return nullptr;
 
     // Check for and consume THEN token
-    if (stream.currentToken.name != "THEN") {
+    if (stream.currentToken.type != Type::Then) {
         std::string msg = "[{}:{}] Expected 'then' followed, found '{}'";
         auto l = stream.currentToken.position.lineno;
         auto c = stream.currentToken.position.colno;
@@ -38,7 +38,7 @@ ExprPtr Parser::parseIfExpr() {
     if (!then) return nullptr;
 
     // Check for and consume ELSE token
-    if (stream.currentToken.name != "ELSE") {
+    if (stream.currentToken.type != Type::Else) {
         std::string msg = "[{}:{}] Expected 'else' followed, found '{}'";
         auto l = stream.currentToken.position.lineno;
         auto c = stream.currentToken.position.colno;
@@ -73,7 +73,7 @@ ExprPtr Parser::parseParenExpr() {
     if (!value) return nullptr;
 
     // Check for matching RPAREN
-    if (stream.currentToken.name != "RPAREN") {
+    if (stream.currentToken.type != Type::Rparen) {
         std::string msg = "[{}:{}] Expected ')', found '{}'";
         auto l = stream.currentToken.position.lineno;
         auto c = stream.currentToken.position.colno;
@@ -87,11 +87,11 @@ ExprPtr Parser::parseParenExpr() {
 }
 
 ExprPtr Parser::parseIdExpr() {
-    // Get identifier name
+    // Get identifier type
     std::string id = stream.currentToken.value;
 
     // Check if next token is LPAREN
-    if (stream.getNextToken().name != "LPAREN") {
+    if (stream.getNextToken().type != Type::Lparen) {
         // If not, then simple variable
         return std::make_unique<VariableExpr>(id);
     }
@@ -99,7 +99,7 @@ ExprPtr Parser::parseIdExpr() {
     // If reach here, then it is function call
     // Consume LPAREN and check for RPAREN
     std::vector<ExprPtr> args;
-    if (stream.getNextToken().name != "RPAREN") {
+    if (stream.getNextToken().type != Type::Rparen) {
         // Not RPAREN -> Function call with arguments
         // Loop to get all arguments
         while (true) {
@@ -109,10 +109,10 @@ ExprPtr Parser::parseIdExpr() {
 
             // Check for RPAREN
             // then break this loop
-            if (stream.currentToken.name == "RPAREN") break;
+            if (stream.currentToken.type == Type::Rparen) break;
 
             // Check if not comma then raise error
-            if (stream.currentToken.name != "COMMA") {
+            if (stream.currentToken.type != Type::Comma) {
                 std::string msg = "[{}:{}] Expected ')' or ',' in argument list, found '{}'";
                 auto l = stream.currentToken.position.lineno;
                 auto c = stream.currentToken.position.colno;
@@ -133,14 +133,14 @@ ExprPtr Parser::parseIdExpr() {
 
 ExprPtr Parser::parsePrimary() {
     // This method is self-explanatory
-    auto name = stream.currentToken.name;
-    if (name == "NUMBER") {
+    auto name = stream.currentToken.type;
+    if (name == Type::Number) {
         return parseNumExpr();
-    } else if (name == "LPAREN") {
+    } else if (name == Type::Lparen) {
         return parseParenExpr();
-    } else if (name == "ID") {
+    } else if (name == Type::Id) {
         return parseIdExpr();
-    } else if (name == "IF") {
+    } else if (name == Type::If) {
         return parseIfExpr();
     } else {
         std::string msg = "[{}:{}] Expression expected, found '{}'";
@@ -201,8 +201,8 @@ ExprPtr Parser::parseBinOpRHS(int exprPre, ExprPtr lhs) {
 
 ProtoPtr Parser::parseProto() {
     // Assert that current token is an ID
-    if (stream.currentToken.name != "ID") {
-        std::string msg = "[{}:{}] Expected function name in prototype, found '{}'";
+    if (stream.currentToken.type != Type::Id) {
+        std::string msg = "[{}:{}] Expected function type in prototype, found '{}'";
         auto l = stream.currentToken.position.lineno;
         auto c = stream.currentToken.position.colno;
         auto v = stream.currentToken.value;
@@ -210,11 +210,11 @@ ProtoPtr Parser::parseProto() {
         throw LexingError(msg.c_str());
     }
 
-    // Get function name, i.e. the ID
+    // Get function type, i.e. the ID
     auto func_name = stream.currentToken.value;
 
     // Consume ID and check for LPAREN
-    if (stream.getNextToken().name != "LPAREN") {
+    if (stream.getNextToken().type != Type::Lparen) {
         std::string msg = "[{}:{}] Expected '(' in prototype, found '{}'";
         auto l = stream.currentToken.position.lineno;
         auto c = stream.currentToken.position.colno;
@@ -228,16 +228,16 @@ ProtoPtr Parser::parseProto() {
 
     // Check for standalone id
     // ids := ID
-    if (stream.getNextToken().name == "ID") {
+    if (stream.getNextToken().type == Type::Id) {
         ids.push_back(stream.currentToken.value);
 
         // Now check for more COMMA ID pair
-        while (stream.getNextToken().name == "COMMA") {
+        while (stream.getNextToken().type == Type::Comma) {
             // Consume COMMA
             stream.getNextToken();
 
             // Check that an ID follows
-            if (stream.currentToken.name != "ID") {
+            if (stream.currentToken.type != Type::Id) {
                 std::string msg = "[{}:{}] Expected ID in argument list, found '{}'";
                 auto l = stream.currentToken.position.lineno;
                 auto c = stream.currentToken.position.colno;
@@ -252,7 +252,7 @@ ProtoPtr Parser::parseProto() {
     }
 
     // At the end of argument lists, check for RPAREN
-    if (stream.currentToken.name != "RPAREN") {
+    if (stream.currentToken.type != Type::Rparen) {
         std::string msg = "[{}:{}] Expected ')' at the end of argument list, found '{}'";
         auto l = stream.currentToken.position.lineno;
         auto c = stream.currentToken.position.colno;
@@ -288,9 +288,9 @@ ProtoPtr Parser::parseExternStmt() {
 
 ExprPtr Parser::parseTLOStmt() {
     // Check for EXTERN and DEFINE keyword
-    if (stream.currentToken.name == "EXTERN") {
+    if (stream.currentToken.type == Type::Extern) {
         return parseExternStmt();
-    } else if (stream.currentToken.name == "DEFINE") {
+    } else if (stream.currentToken.type == Type::Define) {
         return parseDefineStmt();
     } else {
         std::string msg = "[{}:{}] Expected 'extern' or 'define', found '{}'";
@@ -309,7 +309,7 @@ ExprPtr Parser::parseOtrStmt() {
 
 ExprPtr Parser::parseStmt() {
     // Self-explanatory
-    if (stream.currentToken.name == "EXTERN" || stream.currentToken.name == "DEFINE") {
+    if (stream.currentToken.type == Type::Extern || stream.currentToken.type == Type::Define) {
         return parseTLOStmt();
     }
     return parseOtrStmt();
@@ -322,7 +322,7 @@ std::vector<ExprPtr> Parser::parseStmts() {
     auto stmt = parseStmt();
     while (stmt) {
         // Check semicolon
-        if (stream.currentToken.name != "SEMICOLON") {
+        if (stream.currentToken.type != Type::Semicolon) {
             std::string msg = "[{}:{}] Expected ';' after statement, found '{}'";
             auto l = stream.currentToken.position.lineno;
             auto c = stream.currentToken.position.colno;
