@@ -12,36 +12,35 @@
 
 #include <llvm/IR/IRBuilder.h>
 #include <llvm/IR/LLVMContext.h>
-#include <llvm/IR/LegacyPassManager.h>
+#include <llvm/IR/PassManager.h>
 #include <llvm/IR/Module.h>
 
-#include "utility.hpp"
+namespace Firestorm::AST {
+    /// @brief Contains LLVM's optimisation passes to run when compiling Firestorm code.
+    struct Optimiser {
+        llvm::FunctionPassManager passManager;
 
-struct Expr;
-using ExprPtr = std::unique_ptr<Expr>;
+        explicit Optimiser(llvm::Module& m);
+    };
 
-struct CodeGenerator {
-    llvm::LLVMContext context;
-    llvm::IRBuilder<> builder;
-    llvm::Module module;
-    llvm::legacy::FunctionPassManager passManager;
-    std::map<std::string, llvm::Value *> namedValues;
+    /// @brief Contains LLVM elements used to emit LLVM IR for Firestorm code.
+    struct CodeGenerator {
+        llvm::LLVMContext context;
+        llvm::IRBuilder<> builder;
+        llvm::Module module;
+        Optimiser optimiser;
+        std::map<std::string, llvm::Value *> namedValues;
 
+        CodeGenerator();
 
-    CodeGenerator();
+        CodeGenerator(const CodeGenerator &) = delete;
 
-    CodeGenerator(const CodeGenerator &) = delete;
+        CodeGenerator(CodeGenerator &&) = delete;
 
-    CodeGenerator(CodeGenerator &&) = delete;
+        void operator=(const CodeGenerator &) = delete;
 
-    void operator=(const CodeGenerator &) = delete;
-
-    void operator=(CodeGenerator &&) = delete;
-};
-
-class CodegenError : public FirestormError {
-public:
-    explicit CodegenError(const char *msg) : FirestormError(msg) {}
-};
+        void operator=(CodeGenerator &&) = delete;
+    };
+}
 
 #endif //FIRESTORM_CODEGEN_HPP
