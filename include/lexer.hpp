@@ -27,22 +27,23 @@ namespace {
         else already = true;
 
         // I. Keywords
+        // Since these are keywords, the pattern needs to match only if there
+        // are whitespaces after them
         // 1. If statement
-        rule_set.emplace_back("IF", std::regex("^if"));
-        rule_set.emplace_back("THEN", std::regex("^then"));
-        rule_set.emplace_back("ELSE", std::regex("^else"));
+        rule_set.emplace_back("IF", std::regex("^if(?=\\s+)"));
+        rule_set.emplace_back("THEN", std::regex("^then(?=\\s+)"));
+        rule_set.emplace_back("ELSE", std::regex("^else(?=\\s+)"));
 
         // 2. While loop
-//    rule_set.emplace_back("WHILE", std::regex("^while"));
+//    rule_set.emplace_back("WHILE", std::regex("^while(?=\s+)"));
         // "then" is already present
-        // "end" is already present
 
         // 3. Function declaration
-        rule_set.emplace_back("DEFINE", std::regex("^define"));
+        rule_set.emplace_back("DEFINE", std::regex("^define(?=\\s+)"));
         // "end" is already present
 
         // 4. External symbol
-        rule_set.emplace_back("EXTERN", std::regex("^extern"));
+        rule_set.emplace_back("EXTERN", std::regex("^extern(?=\\s+)"));
 
         // II. Literals
         // 1. Numbers
