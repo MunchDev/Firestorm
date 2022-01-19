@@ -3,14 +3,44 @@
 //
 #include <algorithm>
 #include <fmt/format.h>
+#include <map>
 #include <regex>
 
 #include "lexer.hpp"
 
 [[maybe_unused]]
 std::string Token::toString() const {
-    std::string msg = "Token(name={}, value={}, index={}, lineno={}, colno={})";
-    return fmt::format(msg, name, value, position.index, position.lineno, position.colno);
+    std::string msg = "Token(type={}, value={}, index={}, lineno={}, colno={})";
+    return fmt::format(msg, getType(), value, position.index, position.lineno, position.colno);
+}
+
+const auto& getTypeName(Type type) {
+    static std::map<Type, std::string> type_map {
+            {Type::Eof, "EOF"},
+            {Type::If, "IF"},
+            {Type::Then, "THEN"},
+            {Type::Else, "ELSE"},
+//            {Type::While, "WHILE"},
+            {Type::Define, "DEFINE"},
+            {Type::Extern, "EXTERN"},
+            {Type::Number, "NUMBER"},
+            {Type::Plus, "PLUS"},
+            {Type::Minus, "MINUS"},
+            {Type::Times, "TIMES"},
+            {Type::Divide, "DIVIDE"},
+            {Type::Equ, "EQU"},
+            {Type::Lt, "LT"},
+//            {Type::Equals, "EQUALS"},
+            {Type::Lparen, "LPAREN"},
+            {Type::Rparen, "RPAREN"},
+            {Type::Comma, "COMMA"},
+            {Type::Id, "ID"},
+    };
+    return type_map[type];
+}
+
+std::string Token::getType() const {
+    return getTypeName(type);
 }
 
 Token TokenStream::getNextToken() {

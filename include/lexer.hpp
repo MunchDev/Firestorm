@@ -104,6 +104,9 @@ struct Token {
 
     [[nodiscard]]
     inline bool isEOF() const { return type == Type::Eof; };
+
+    [[nodiscard]]
+    std::string getType() const;
 };
 
 struct Lexer;
