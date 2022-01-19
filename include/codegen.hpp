@@ -1,7 +1,6 @@
 //
 // Created by Nguyen Thai Binh on 18/1/22.
 //
-
 #ifndef FIRESTORM_CODEGEN_HPP
 #define FIRESTORM_CODEGEN_HPP
 
@@ -42,5 +41,4 @@ namespace Firestorm::AST {
         void operator=(CodeGenerator &&) = delete;
     };
 }
-
 #endif //FIRESTORM_CODEGEN_HPP
