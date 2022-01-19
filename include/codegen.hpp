@@ -18,6 +18,7 @@ namespace Firestorm::AST {
     /// @brief Contains LLVM's optimisation passes to run when compiling Firestorm code.
     struct Optimiser {
         llvm::FunctionPassManager passManager;
+        llvm::FunctionAnalysisManager analysisManager;
 
         explicit Optimiser(llvm::Module& m);
     };
