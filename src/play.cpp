@@ -1,12 +1,18 @@
 //
 // Created by Nguyen Thai Binh on 18/1/22.
 //
+#include "ast.hpp"
+#include "custom_exceptions.hpp"
+#include "lexer.hpp"
+#include "parser.hpp"
 #include "play.hpp"
+
+#include <iostream>
 
 void loop_output_ir() {
     // Initialisation
-    Lexer lexer;
-    Token previousToken;        // Continue the previous stream
+    Firestorm::Lexing::Lexer lexer;
+    Firestorm::Lexing::Token previousToken;        // Continue the previous stream
 
     std::string input;
 
@@ -23,7 +29,7 @@ void loop_output_ir() {
             stream.currentToken = previousToken;
 
             // Parse token stream
-            auto program = Parser(stream).parse();
+            auto program = Firestorm::Parsing::Parser(stream).parse();
 
             // Save last token
             previousToken = stream.currentToken;
@@ -34,10 +40,10 @@ void loop_output_ir() {
                 IR->print(llvm::outs());
                 llvm::outs() << '\n';
             }
-        } catch (const FirestormError &error) {
+        } catch (const Firestorm::Utility::FirestormError &error) {
             llvm::outs() << "Error: " << error.what() << "\n";
         }
     }
     // Print the entire module
-    getCodegen().module.print(llvm::outs(), nullptr);
+    Firestorm::AST::getCodegen().module.print(llvm::outs(), nullptr);
 }
