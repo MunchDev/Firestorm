@@ -40,7 +40,6 @@ namespace {
 
         // 3. Function declaration
         rule_set.emplace_back("DEFINE", std::regex("^define(?=\\s+)"));
-        // "end" is already present
 
         // 4. External symbol
         rule_set.emplace_back("EXTERN", std::regex("^extern(?=\\s+)"));
