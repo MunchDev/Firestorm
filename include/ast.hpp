@@ -5,131 +5,120 @@
 #ifndef FIRESTORM_AST_HPP
 #define FIRESTORM_AST_HPP
 
-#include <memory>
-#include <string>
-#include <utility>
-#include <vector>
-
-#include <llvm/ADT/APFloat.h>
-#include <llvm/ADT/STLExtras.h>
-#include <llvm/IR/BasicBlock.h>
-#include <llvm/IR/Constants.h>
-#include <llvm/IR/DerivedTypes.h>
-#include <llvm/IR/Function.h>
-#include <llvm/IR/IRBuilder.h>
-#include <llvm/IR/LLVMContext.h>
-#include <llvm/IR/Module.h>
-#include <llvm/IR/Type.h>
-#include <llvm/IR/Verifier.h>
-
 #include "codegen.hpp"
 
-struct Expr {
-    virtual ~Expr() = default;
+#include <memory>
+#include <string>
+#include <vector>
 
-    [[nodiscard]]
-    virtual std::string toString() const = 0;
+namespace Firestorm::AST {
 
-    [[nodiscard]]
-    virtual llvm::Value *generateIR() const = 0;
-};
+    struct Expr {
+        virtual ~Expr() = default;
 
-using ExprPtr = std::unique_ptr<Expr>;
+        [[nodiscard]]
+        virtual std::string toString() const = 0;
 
-struct NumberExpr : public Expr {
-    double value;
+        [[nodiscard]]
+        virtual llvm::Value *generateIR() const = 0;
+    };
 
-    explicit NumberExpr(double v) : value(v) {}
+    using ExprPtr = std::unique_ptr<Expr>;
 
-    [[nodiscard]]
-    std::string toString() const override;
+    struct NumberExpr : public Expr {
+        double value;
 
-    [[nodiscard]]
-    llvm::Value *generateIR() const override;
-};
+        explicit NumberExpr(double v) : value(v) {}
 
-struct VariableExpr : public Expr {
-    std::string name;
+        [[nodiscard]]
+        std::string toString() const override;
 
-    explicit VariableExpr(std::string n) : name(std::move(n)) {}
+        [[nodiscard]]
+        llvm::Value *generateIR() const override;
+    };
 
-    [[nodiscard]]
-    std::string toString() const override;
+    struct VariableExpr : public Expr {
+        std::string name;
 
-    [[nodiscard]]
-    llvm::Value *generateIR() const override;
-};
+        explicit VariableExpr(std::string n) : name(std::move(n)) {}
 
-struct IfExpr : public Expr {
-    ExprPtr condition_clause, then_clause, else_clause;
+        [[nodiscard]]
+        std::string toString() const override;
 
-    IfExpr(ExprPtr c, ExprPtr t, ExprPtr e)
-            : condition_clause(std::move(c)), then_clause(std::move(t)), else_clause(std::move(e)) {}
+        [[nodiscard]]
+        llvm::Value *generateIR() const override;
+    };
 
-    [[nodiscard]]
-    std::string toString() const override;
+    struct IfExpr : public Expr {
+        ExprPtr condition_clause, then_clause, else_clause;
 
-    [[nodiscard]]
-    llvm::Value *generateIR() const override;
-};
+        IfExpr(ExprPtr c, ExprPtr t, ExprPtr e)
+                : condition_clause(std::move(c)), then_clause(std::move(t)), else_clause(std::move(e)) {}
 
-struct BinaryExpr : public Expr {
-    ExprPtr lhs;
-    std::string op;
-    ExprPtr rhs;
+        [[nodiscard]]
+        std::string toString() const override;
 
-    BinaryExpr(ExprPtr l, std::string o, ExprPtr r) : lhs(std::move(l)), op(std::move(o)), rhs(std::move(r)) {}
+        [[nodiscard]]
+        llvm::Value *generateIR() const override;
+    };
 
-    [[nodiscard]]
-    std::string toString() const override;
+    struct BinaryExpr : public Expr {
+        ExprPtr lhs;
+        std::string op;
+        ExprPtr rhs;
 
-    [[nodiscard]]
-    llvm::Value *generateIR() const override;
-};
+        BinaryExpr(ExprPtr l, std::string o, ExprPtr r) : lhs(std::move(l)), op(std::move(o)), rhs(std::move(r)) {}
 
-struct CallExpr : public Expr {
-    std::string callee;
-    std::vector<ExprPtr> args;
+        [[nodiscard]]
+        std::string toString() const override;
 
-    CallExpr(std::string c, std::vector<ExprPtr> a) : callee(std::move(c)), args(std::move(a)) {}
+        [[nodiscard]]
+        llvm::Value *generateIR() const override;
+    };
 
-    [[nodiscard]]
-    std::string toString() const override;
+    struct CallExpr : public Expr {
+        std::string callee;
+        std::vector<ExprPtr> args;
 
-    [[nodiscard]]
-    llvm::Value *generateIR() const override;
-};
+        CallExpr(std::string c, std::vector<ExprPtr> a) : callee(std::move(c)), args(std::move(a)) {}
 
-struct Prototype : public Expr {
-    std::string name;
-    std::vector<std::string> args;
+        [[nodiscard]]
+        std::string toString() const override;
 
-    Prototype(std::string n, std::vector<std::string> a) : name(std::move(n)), args(std::move(a)) {}
+        [[nodiscard]]
+        llvm::Value *generateIR() const override;
+    };
 
-    [[nodiscard]]
-    std::string toString() const override;
+    struct Prototype : public Expr {
+        std::string name;
+        std::vector<std::string> args;
 
-    [[nodiscard]]
-    llvm::Function *generateIR() const override;
-};
+        Prototype(std::string n, std::vector<std::string> a) : name(std::move(n)), args(std::move(a)) {}
 
-using ProtoPtr = std::unique_ptr<Prototype>;
+        [[nodiscard]]
+        std::string toString() const override;
 
-struct Function : public Expr {
-    ProtoPtr proto;
-    ExprPtr body;
+        [[nodiscard]]
+        llvm::Function *generateIR() const override;
+    };
 
-    Function(ProtoPtr p, ExprPtr b) : proto(std::move(p)), body(std::move(b)) {}
+    using ProtoPtr = std::unique_ptr<Prototype>;
 
-    [[nodiscard]]
-    std::string toString() const override;
+    struct Function : public Expr {
+        ProtoPtr proto;
+        ExprPtr body;
 
-    [[nodiscard]]
-    llvm::Value *generateIR() const override;
-};
+        Function(ProtoPtr p, ExprPtr b) : proto(std::move(p)), body(std::move(b)) {}
 
-using FunctionPtr = std::unique_ptr<Function>;
+        [[nodiscard]]
+        std::string toString() const override;
 
-CodeGenerator &getCodegen();
+        [[nodiscard]]
+        llvm::Value *generateIR() const override;
+    };
 
+    using FunctionPtr = std::unique_ptr<Function>;
+
+    CodeGenerator &getCodegen();
+}
 #endif //FIRESTORM_AST_HPP
