@@ -258,7 +258,11 @@ llvm::Value *IfExpr::generateIR() const {
     auto else_code = else_clause->generateIR();
     if (!else_code) return nullptr;
 
-    // codegen of else_code
+    // Branch to cont_block (similar to above)
+    Builder().CreateBr(cont_block);
+
+    // codegen of else_clause could change block
+    // Hence, we need to retrieve it
     else_block = Builder().GetInsertBlock();
 
     // Now insert cont_block into function
