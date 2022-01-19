@@ -6,6 +6,7 @@
 #define FIRESTORM_CUSTOM_EXCEPTIONS_HPP
 
 #include <exception>
+#include <fmt/format.h>
 #include <string>
 
 namespace Firestorm::Utility {
@@ -56,35 +57,19 @@ namespace Firestorm::Utility {
     ///
     /// @return An instance of FirestormError or one of its subclasses
     template<class... T>
-    FirestormError getError(ErrorType type, const std::string& msg, T... args);
-
-    /// @brief Get an instance of FirestormError or its subclasses with a message
-    ///
-    /// @param type The type of error to return
-    ///
-    /// @param msg A message accompanying the error
-    ///
-    /// @return An instance of FirestormError or one of its subclasses
-    FirestormError getError(ErrorType type, const std::string& msg);
-
-    /// @brief Get an instance of FirestormError with a message and arguments
-    ///
-    /// @tparam T Any value convertible to std::string
-    ///
-    /// @param msg A message accompanying the error
-    ///
-    /// @param args Variadic arguments, to be passed to fmt::format()
-    ///
-    /// @return An instance of FirestormError or one of its subclasses
-    template<class... T>
-    FirestormError getError(const std::string& msg, T... args);
-
-    /// @brief Get an instance of FirestormError with a message
-    ///
-    /// @param msg A message accompanying the error
-    ///
-    /// @return An instance of FirestormError or one of its subclasses
-    FirestormError getError(const std::string& msg);
+    FirestormError getError(ErrorType type, std::string msg, T&&... args) {
+        msg = fmt::format(msg, args...);
+        switch (type) {
+            case FE:
+                return FirestormError(msg);
+            case LE:
+                return LexerError(msg);
+            case PE:
+                return ParserError(msg);
+            case CE:
+                return CodegenError(msg);
+        }
+    }
 }
 
 
