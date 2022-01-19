@@ -14,6 +14,7 @@
 #include "utility.hpp"
 
 enum class Type {
+    Eof,
     If,
     Then,
     Else,
@@ -94,7 +95,7 @@ namespace {
 }
 
 struct Token {
-    std::string name;
+    Type type;
     std::string value;
     SourcePosition position;
 
@@ -102,7 +103,7 @@ struct Token {
     std::string toString() const;
 
     [[nodiscard]]
-    inline bool isEOF() const { return name == "EOF"; };
+    inline bool isEOF() const { return type == "EOF"; };
 };
 
 struct Lexer;
