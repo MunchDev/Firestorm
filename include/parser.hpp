@@ -23,23 +23,7 @@ namespace Firestorm::Parsing {
     using ProtoPtr = std::unique_ptr<AST::Prototype>;
     using FunctionPtr = std::unique_ptr<AST::Function>;
 
-    std::map<std::string, int> getPrecedenceTable() {
-        std::map<std::string, int> table;
-
-        table["=="] = 100;
-        table["!="] = 100;
-        table[">="] = 100;
-        table["<="] = 100;
-        table[">"] = 100;
-        table["<"] = 100;
-
-        table["+"] = 200;
-        table["-"] = 200;
-        table["*"] = 300;
-        table["/"] = 300;
-
-        return table;
-    }
+    std::map<std::string, int>& getPrecedenceTable();
 
     class Parser {
         Lexing::TokenStream &stream;

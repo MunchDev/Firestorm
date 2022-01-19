@@ -23,6 +23,29 @@ namespace Firestorm::Parsing {
         return -1;
     }
 
+    std::map<std::string, int>& getPrecedenceTable() {
+        static std::map<std::string, int> table;
+
+        // Avoid multiple creation of table
+        static bool already = false;
+        if (already) return table;
+        else already = true;
+
+        table["=="] = 100;
+        table["!="] = 100;
+        table[">="] = 100;
+        table["<="] = 100;
+        table[">"] = 100;
+        table["<"] = 100;
+
+        table["+"] = 200;
+        table["-"] = 200;
+        table["*"] = 300;
+        table["/"] = 300;
+
+        return table;
+    }
+
     ExprPtr Parser::parseIfExpr() {
         // Consume IF token
         stream.getNextToken();
