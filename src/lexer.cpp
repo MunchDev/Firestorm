@@ -15,7 +15,7 @@ std::string Token::toString() const {
 
 Token TokenStream::getNextToken() {
     // Check if finished, return EOF token
-    if (index == source.length()) return currentToken = {"EOF", "EOF", {index, lineno, colno}};
+    if (index == source.length()) return currentToken = {Type::Eof, "EOF", {index, lineno, colno}};
 
     // Get substring, ignoring already lexed
     auto sub_str = source.substr(index, source.length() - index);

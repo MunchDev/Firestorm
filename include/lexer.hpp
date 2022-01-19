@@ -95,7 +95,7 @@ namespace {
 }
 
 struct Token {
-    Type type;
+    Type type{Type::Eof};
     std::string value;
     SourcePosition position;
 
@@ -103,7 +103,7 @@ struct Token {
     std::string toString() const;
 
     [[nodiscard]]
-    inline bool isEOF() const { return type == "EOF"; };
+    inline bool isEOF() const { return type == Type::Eof; };
 };
 
 struct Lexer;
