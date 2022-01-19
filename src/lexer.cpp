@@ -14,8 +14,8 @@ std::string Token::toString() const {
     return fmt::format(msg, getType(), value, position.index, position.lineno, position.colno);
 }
 
-const auto& getTypeName(Type type) {
-    static std::map<Type, std::string> type_map {
+const auto &getTypeName(Type type) {
+    static std::map<Type, std::string> type_map{
             {Type::Eof, "EOF"},
             {Type::If, "IF"},
             {Type::Then, "THEN"},
