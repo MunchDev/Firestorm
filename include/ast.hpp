@@ -12,7 +12,7 @@
 #include <vector>
 
 namespace Firestorm::AST {
-
+    /// @brief Base class for all AST nodes.
     struct Expr {
         virtual ~Expr() = default;
 
@@ -23,8 +23,10 @@ namespace Firestorm::AST {
         virtual llvm::Value *generateIR() const = 0;
     };
 
+    /// @brief Quick using-directive for convenience
     using ExprPtr = std::unique_ptr<Expr>;
 
+    /// @brief Contains a single double-precision floating-point number.
     struct NumberExpr : public Expr {
         double value;
 
@@ -37,6 +39,7 @@ namespace Firestorm::AST {
         llvm::Value *generateIR() const override;
     };
 
+    /// @brief Contains a single named variable.
     struct VariableExpr : public Expr {
         std::string name;
 
@@ -49,6 +52,7 @@ namespace Firestorm::AST {
         llvm::Value *generateIR() const override;
     };
 
+    /// @brief Contains a single conditional expression.
     struct IfExpr : public Expr {
         ExprPtr condition_clause, then_clause, else_clause;
 
@@ -62,6 +66,7 @@ namespace Firestorm::AST {
         llvm::Value *generateIR() const override;
     };
 
+    /// @brief Contains a single binary expression. Can be nested.
     struct BinaryExpr : public Expr {
         ExprPtr lhs;
         std::string op;
@@ -76,6 +81,7 @@ namespace Firestorm::AST {
         llvm::Value *generateIR() const override;
     };
 
+    /// @brief Contains a single function call.
     struct CallExpr : public Expr {
         std::string callee;
         std::vector<ExprPtr> args;
@@ -89,6 +95,7 @@ namespace Firestorm::AST {
         llvm::Value *generateIR() const override;
     };
 
+    /// @brief Contains a single function prototype.
     struct Prototype : public Expr {
         std::string name;
         std::vector<std::string> args;
@@ -102,8 +109,10 @@ namespace Firestorm::AST {
         llvm::Function *generateIR() const override;
     };
 
+    /// @brief Quick using-directive for convenience
     using ProtoPtr = std::unique_ptr<Prototype>;
 
+    /// @brief Contains a single function definition.
     struct Function : public Expr {
         ProtoPtr proto;
         ExprPtr body;
@@ -117,8 +126,10 @@ namespace Firestorm::AST {
         llvm::Value *generateIR() const override;
     };
 
+    /// @brief Quick using-directive for convenience
     using FunctionPtr = std::unique_ptr<Function>;
 
+    /// \return Get an instance of CodeGenerator
     CodeGenerator &getCodegen();
 }
 #endif //FIRESTORM_AST_HPP
