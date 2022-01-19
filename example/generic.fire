@@ -1,3 +1,9 @@
-extern c(a);
-d(e, f);
-sloc
+extern put(n);
+extern putd(n);
+
+define fib(n)
+    if n < 3 then
+        1
+    else
+        fib(n - 1) + fib(n - 2);
+putd(fib(10));
