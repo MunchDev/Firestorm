@@ -13,6 +13,26 @@
 
 #include "utility.hpp"
 
+enum class Type {
+    If,
+    Then,
+    Else,
+    Define,
+    Extern,
+    Number,
+    Plus,
+    Minus,
+    Times,
+    Divide,
+    Eql,
+    Lt,
+    Lparen,
+    Rparen,
+    Comma,
+    Semicolon,
+    Id,
+};
+
 namespace {
     struct SourcePosition {
         long index = -1, lineno = -1, colno = -1;
