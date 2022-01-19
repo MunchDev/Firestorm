@@ -122,7 +122,7 @@ private:
 };
 
 struct Lexer {
-    const std::vector<std::pair<std::string, std::regex>> &rules;
+    const std::vector<std::pair<Type, std::regex>> &rules;
 
     Lexer() : rules(getRuleSet()) {}
 
