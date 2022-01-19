@@ -25,7 +25,7 @@ enum class Type {
     Minus,
     Times,
     Divide,
-    Eql,
+    Equ,
     Lt,
 //    Equals,
     Lparen,
