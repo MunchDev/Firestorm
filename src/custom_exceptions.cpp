@@ -1,7 +1,7 @@
 //
 // Created by Nguyen Thai Binh on 19/1/22.
 //
-#include "custom_exceptions.hpp"
+#include "Firestorm/custom_exceptions.hpp"
 
 #include <exception>
 #include <fmt/format.h>

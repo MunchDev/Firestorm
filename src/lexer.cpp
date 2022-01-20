@@ -1,8 +1,8 @@
 //
 // Created by Nguyen Thai Binh on 16/1/22.
 //
-#include "custom_exceptions.hpp"
-#include "lexer.hpp"
+#include "Firestorm/custom_exceptions.hpp"
+#include "Firestorm/lexer.hpp"
 
 #include <algorithm>
 #include <fmt/format.h>

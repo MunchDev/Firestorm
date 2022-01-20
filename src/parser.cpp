@@ -1,10 +1,10 @@
 //
 // Created by Nguyen Thai Binh on 17/1/22.
 //
-#include "ast.hpp"
-#include "custom_exceptions.hpp"
-#include "lexer.hpp"
-#include "parser.hpp"
+#include "Firestorm/ast.hpp"
+#include "Firestorm/custom_exceptions.hpp"
+#include "Firestorm/lexer.hpp"
+#include "Firestorm/parser.hpp"
 
 #include <memory>
 #include <vector>

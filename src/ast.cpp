@@ -1,9 +1,9 @@
 //
 // Created by Nguyen Thai Binh on 17/1/22.
 //
-#include "ast.hpp"
-#include "codegen.hpp"
-#include "custom_exceptions.hpp"
+#include "Firestorm/ast.hpp"
+#include "Firestorm/codegen.hpp"
+#include "Firestorm/custom_exceptions.hpp"
 
 #include <fmt/format.h>
 #include <sstream>

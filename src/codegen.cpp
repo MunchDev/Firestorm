@@ -5,7 +5,7 @@
 #include <llvm/Transforms/Scalar.h>
 #include <llvm/Transforms/InstCombine/InstCombine.h>
 
-#include "codegen.hpp"
+#include "Firestorm/codegen.hpp"
 
 namespace Firestorm::AST {
 
