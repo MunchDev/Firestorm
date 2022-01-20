@@ -7,7 +7,7 @@
 #include <fmt/format.h>
 
 namespace Firestorm::Utility {
-    FirestormError::FirestormError(const std::string& msg) : std::runtime_error(msg) {}
+    FirestormError::FirestormError(const std::string &msg) : std::runtime_error(msg) {}
 
     LexerError::LexerError(const std::string &msg) : FirestormError(msg), std::runtime_error(msg) {}
 

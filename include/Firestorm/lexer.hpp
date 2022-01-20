@@ -66,11 +66,11 @@ namespace Firestorm::Lexing {
     /// @brief Can be used to retrieve tokens one-by-one from source;
     struct TokenStream {
         const Lexer &lexer;
-        const std::string& source;
+        const std::string &source;
         long index = 0, lineno = 1, colno = 1;
         Token currentToken;
 
-        TokenStream(const Lexer &l, const std::string& s) : lexer(l), source(s) { updateSourcePos(); }
+        TokenStream(const Lexer &l, const std::string &s) : lexer(l), source(s) { updateSourcePos(); }
 
         /// @return Next token in source
         Token getNextToken();

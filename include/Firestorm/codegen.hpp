@@ -19,7 +19,7 @@ namespace Firestorm::AST {
     struct Optimiser {
         llvm::legacy::FunctionPassManager passManager;
 
-        explicit Optimiser(llvm::Module& m);
+        explicit Optimiser(llvm::Module &m);
     };
 
     /// @brief Contains LLVM elements used to emit LLVM IR for Firestorm code.

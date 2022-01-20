@@ -14,28 +14,28 @@ namespace Firestorm::Utility {
     ///
     /// @note This exception is not to be thrown directly. Use getError() instead.
     struct FirestormError : virtual public std::runtime_error {
-        explicit FirestormError(const std::string& msg);
+        explicit FirestormError(const std::string &msg);
     };
 
     /// @brief Subclass of FirestormError. Thrown when an error occurred while lexing Firestorm code.
     ///
     /// @note This exception is not to be thrown directly. Use getError() instead.
     struct LexerError : FirestormError {
-        explicit LexerError(const std::string& msg);
+        explicit LexerError(const std::string &msg);
     };
 
     /// @brief Subclass of FirestormError. Thrown when an error occurred while parsing Firestorm code.
     ///
     /// @note This exception is not to be thrown directly. Use getError() instead.
     struct ParserError : FirestormError {
-        explicit ParserError(const std::string& msg);
+        explicit ParserError(const std::string &msg);
     };
 
     /// @brief Subclass of FirestormError. Thrown when an error occurred while emitting LLVM IR for Firestorm code.
     ///
     /// @note This exception is not to be thrown directly. Use getError() instead.
     struct CodegenError : FirestormError {
-        explicit CodegenError(const std::string& msg);
+        explicit CodegenError(const std::string &msg);
     };
 
     enum ErrorType {
@@ -57,7 +57,7 @@ namespace Firestorm::Utility {
     ///
     /// @return An instance of FirestormError or one of its subclasses
     template<class... T>
-    FirestormError getError(ErrorType type, std::string msg, T&&... args) {
+    FirestormError getError(ErrorType type, std::string msg, T &&... args) {
         msg = fmt::format(msg, args...);
         switch (type) {
             case FE:
@@ -71,7 +71,6 @@ namespace Firestorm::Utility {
         }
     }
 }
-
 
 
 #endif //FIRESTORM_CUSTOM_EXCEPTIONS_HPP
