@@ -5,7 +5,7 @@
 #include "custom_exceptions.hpp"
 #include "lexer.hpp"
 #include "parser.hpp"
-#include "play.hpp"
+#include "frontend.hpp"
 
 #include <iostream>
 

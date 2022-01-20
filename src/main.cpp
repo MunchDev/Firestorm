@@ -1,7 +1,7 @@
 //
 // Created by Nguyen Thai Binh on 17/1/22.
 //
-#include "play.hpp"
+#include "frontend.hpp"
 
 int main() {
     loop_output_ir();

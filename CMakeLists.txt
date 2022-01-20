@@ -28,6 +28,6 @@ target_link_libraries(Firestorm PUBLIC fmt::fmt ${LLVM_LIBS})
 
 add_executable(FirestormMain
     src/main.cpp
-    src/play.cpp
+    src/frontend.cpp
     )
 target_link_libraries(FirestormMain PUBLIC Firestorm)
