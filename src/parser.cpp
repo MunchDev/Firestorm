@@ -10,7 +10,7 @@
 #include <vector>
 
 namespace Firestorm::Parsing {
-    Utility::FirestormError getError(const std::string& msg, const Lexing::Token& token) {
+    Utility::FirestormError getError(const std::string &msg, const Lexing::Token &token) {
         auto l = token.position.lineno;
         auto c = token.position.colno;
         auto v = token.value;
@@ -23,7 +23,7 @@ namespace Firestorm::Parsing {
         return -1;
     }
 
-    std::map<std::string, int>& getPrecedenceTable() {
+    std::map<std::string, int> &getPrecedenceTable() {
         static std::map<std::string, int> table;
 
         // Avoid multiple creation of table
@@ -44,6 +44,65 @@ namespace Firestorm::Parsing {
         table["/"] = 300;
 
         return table;
+    }
+
+    ExprPtr Parser::parseForExpr() {
+        // Consume FOR token and check for ID that followed
+        if (stream.getNextToken().type != Lexing::Type::Id) {
+            throw getError("[{}:{}] Expected an identifier, found '{}'", stream.currentToken);
+        }
+
+        // Get variable name
+        auto var = stream.currentToken.value;
+
+        // Consume ID and check for EQUALS
+        if (stream.getNextToken().type != Lexing::Type::Equals) {
+            throw getError("[{}:{}] Expected '=' after name in for loop, found '{}'", stream.currentToken);
+        }
+
+        // Consume EQUALS
+        stream.getNextToken();
+
+        // Parse start value
+        auto start = parseExpr();
+        if (!start) return nullptr;
+
+        // Check for COMMA
+        if (stream.currentToken.type != Lexing::Type::Comma) {
+            throw getError("[{}:{}] Expected ',' after start in for loop, found '{}'", stream.currentToken);
+        }
+
+        // Consume COMMA
+        stream.getNextToken();
+
+        // Parse end value
+        auto end = parseExpr();
+        if (!end) return nullptr;
+
+        // Check for optional step expr
+        // By checking for comma
+        ExprPtr step;
+        if (stream.currentToken.type == Lexing::Type::Comma) {
+            // Consume comma
+            stream.getNextToken();
+
+            // Parse step value
+            step = parseExpr();
+            if (!step) return nullptr;
+        }
+
+        // Check and consume THEN
+        if (stream.currentToken.type != Lexing::Type::Then) {
+            throw getError("[{}:{}] Expected 'then' in for loop, found '{}'", stream.currentToken);
+        }
+        stream.getNextToken();
+
+        // Parse body
+        auto body = parseExpr();
+        if (!body) return nullptr;
+
+        return std::make_unique<AST::ForExpr>(var, std::move(start), std::move(end),
+                                              std::move(step), std::move(body));
     }
 
     ExprPtr Parser::parseIfExpr() {
@@ -146,15 +205,17 @@ namespace Firestorm::Parsing {
 
     ExprPtr Parser::parsePrimary() {
         // This method is self-explanatory
-        auto name = stream.currentToken.type;
-        if (name == Lexing::Type::Number) {
+        auto type = stream.currentToken.type;
+        if (type == Lexing::Type::Number) {
             return parseNumExpr();
-        } else if (name == Lexing::Type::Lparen) {
+        } else if (type == Lexing::Type::Lparen) {
             return parseParenExpr();
-        } else if (name == Lexing::Type::Id) {
+        } else if (type == Lexing::Type::Id) {
             return parseIdExpr();
-        } else if (name == Lexing::Type::If) {
+        } else if (type == Lexing::Type::If) {
             return parseIfExpr();
+        } else if (type == Lexing::Type::For) {
+            return parseForExpr();
         } else {
             throw getError("[{}:{}] Expected an expression, found '{}'", stream.currentToken);
         }

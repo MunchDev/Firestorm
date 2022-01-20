@@ -14,7 +14,9 @@ namespace Firestorm::Lexing {
 
 namespace Firestorm::AST {
     class Expr;
+
     class Prototype;
+
     class Function;
 }
 
@@ -23,7 +25,7 @@ namespace Firestorm::Parsing {
     using ProtoPtr = std::unique_ptr<AST::Prototype>;
     using FunctionPtr = std::unique_ptr<AST::Function>;
 
-    std::map<std::string, int>& getPrecedenceTable();
+    std::map<std::string, int> &getPrecedenceTable();
 
     class Parser {
         Lexing::TokenStream &stream;
@@ -107,6 +109,12 @@ namespace Firestorm::Parsing {
 
         // if_expr      :=  IF expr THEN expr ELSE expr
         ExprPtr parseIfExpr();
+
+        // for_expr     :=  FOR ID EQUALS expr COMMA expr step_clause THEN expr
+        //
+        // step_clause  :=
+        //              :=  COMMA expr
+        ExprPtr parseForExpr();
 
         // Util method for bin_op_rhs
         int getOperatorPrecedence();
