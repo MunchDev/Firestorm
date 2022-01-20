@@ -32,8 +32,8 @@ namespace Firestorm::Lexing {
         rule_set.emplace_back(Type::Then, std::regex("^then(?=\\s+)"));
         rule_set.emplace_back(Type::Else, std::regex("^else(?=\\s+)"));
 
-        // 2. While loop
-//    rule_set.emplace_back(Type::While, std::regex("^while(?=\s+)"));
+        // 2. For loop
+        rule_set.emplace_back(Type::For, std::regex("^for(?=\\s+)"));
         // "then" is already present
 
         // 3. Function declaration
@@ -58,7 +58,7 @@ namespace Firestorm::Lexing {
         rule_set.emplace_back(Type::Lt, std::regex("^<"));
 
         // IV. Miscellaneous tokens
-//    rule_set.emplace_back("EQUALS", std::regex("^="));
+        rule_set.emplace_back(Type::Equals, std::regex("^="));
         rule_set.emplace_back(Type::Lparen, std::regex("^\\("));
         rule_set.emplace_back(Type::Rparen, std::regex("^\\)"));
         rule_set.emplace_back(Type::Comma, std::regex("^,"));
