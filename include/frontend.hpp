@@ -5,6 +5,11 @@
 #ifndef FIRESTORM_FRONTEND_HPP
 #define FIRESTORM_FRONTEND_HPP
 
-void loop_output_ir();
+namespace Firestorm::Frontend {
+    class Interpreter {
+    public:
+        static void run();
+    };
+}
 
 #endif //FIRESTORM_FRONTEND_HPP

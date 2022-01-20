@@ -4,6 +4,6 @@
 #include "frontend.hpp"
 
 int main() {
-    loop_output_ir();
+    Firestorm::Frontend::Interpreter::run();
     return 0;
 }
