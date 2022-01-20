@@ -11,14 +11,13 @@
 
 #include <llvm/IR/IRBuilder.h>
 #include <llvm/IR/LLVMContext.h>
-#include <llvm/IR/PassManager.h>
+#include <llvm/IR/LegacyPassManager.h>
 #include <llvm/IR/Module.h>
 
 namespace Firestorm::AST {
     /// @brief Contains LLVM's optimisation passes to run when compiling Firestorm code.
     struct Optimiser {
-        llvm::FunctionPassManager passManager;
-        llvm::FunctionAnalysisManager analysisManager;
+        llvm::legacy::FunctionPassManager passManager;
 
         explicit Optimiser(llvm::Module& m);
     };

@@ -1,10 +1,8 @@
 //
 // Created by Nguyen Thai Binh on 18/1/22.
 //
-#include <llvm/Transforms/Scalar/SimplifyCFG.h>
-#include <llvm/Transforms/Scalar/Reassociate.h>
-#include <llvm/Transforms/Scalar/InstSimplifyPass.h>
 #include <llvm/Transforms/Scalar/GVN.h>
+#include <llvm/Transforms/Scalar.h>
 #include <llvm/Transforms/InstCombine/InstCombine.h>
 
 #include "codegen.hpp"
@@ -14,14 +12,19 @@ namespace Firestorm::AST {
     CodeGenerator::CodeGenerator() : context(), builder(context), module("Main", context),
                                      optimiser(module) {}
 
-    Optimiser::Optimiser(llvm::Module &m) {
+    Optimiser::Optimiser(llvm::Module &m) : passManager(&m) {
         // Do simple "peephole" optimizations and bit-twiddling options.
-        passManager.addPass(llvm::InstCombinePass());
+        passManager.add(llvm::createInstructionCombiningPass());
+
         // Re-associate expressions.
-        passManager.addPass(llvm::ReassociatePass());
+        passManager.add(llvm::createReassociatePass());
+
         // Eliminate Common SubExpressions.
-        passManager.addPass(llvm::GVN());
+        passManager.add(llvm::createGVNPass());
+
         // Simplify the control flow graph (deleting unreachable blocks, etc).
-        passManager.addPass(llvm::SimplifyCFGPass());
+        passManager.add(llvm::createCFGSimplificationPass());
+
+        passManager.doInitialization();
     }
 }

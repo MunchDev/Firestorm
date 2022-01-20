@@ -200,7 +200,7 @@ namespace Firestorm::AST {
             // Perform optimisation
             // Notes: Temporary remove optimiser since its API is changing
             // and no one knows how to use the new one.
-            // Optimiser().passManager.run(*func, Optimiser().analysisManager);
+            Optimiser().passManager.run(*func);
 
             return func;
         }
