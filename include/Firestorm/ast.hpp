@@ -9,6 +9,7 @@
 
 #include <memory>
 #include <string>
+#include <utility>
 #include <vector>
 
 namespace Firestorm::AST {
@@ -58,6 +59,23 @@ namespace Firestorm::AST {
 
         IfExpr(ExprPtr c, ExprPtr t, ExprPtr e)
                 : condition_clause(std::move(c)), then_clause(std::move(t)), else_clause(std::move(e)) {}
+
+        [[nodiscard]]
+        std::string toString() const override;
+
+        [[nodiscard]]
+        llvm::Value *generateIR() const override;
+    };
+
+    /// @brief Contains a single for-loop expression.
+
+    struct ForExpr : public Expr {
+        std::string varName;
+        ExprPtr start, end, step, body;
+
+        ForExpr(std::string v, ExprPtr s, ExprPtr e, ExprPtr s1, ExprPtr b) : varName(std::move(v)),
+                                                                              start(std::move(s)), end(std::move(e)),
+                                                                              step(std::move(s1)), body(std::move(b)) {}
 
         [[nodiscard]]
         std::string toString() const override;
@@ -129,7 +147,7 @@ namespace Firestorm::AST {
     /// @brief Quick using-directive for convenience
     using FunctionPtr = std::unique_ptr<Function>;
 
-    /// \return Get an instance of CodeGenerator
+    /// @return Get an instance of CodeGenerator
     CodeGenerator &getCodegen();
 }
 #endif //FIRESTORM_AST_HPP

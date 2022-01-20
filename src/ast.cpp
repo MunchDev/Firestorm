@@ -278,4 +278,13 @@ namespace Firestorm::AST {
         phi->addIncoming(else_code, else_block);
         return phi;
     }
+
+    std::string ForExpr::toString() const {
+        auto s = start->toString();
+        auto e = end->toString();
+        auto s1 = step->toString();
+        auto b = body->toString();
+
+        return fmt::format("ForExpr(var={}, start={}, end={}, step={}, body={})", varName, s, e, s1, b);
+    }
 }
