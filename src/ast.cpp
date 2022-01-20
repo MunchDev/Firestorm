@@ -287,4 +287,81 @@ namespace Firestorm::AST {
 
         return fmt::format("ForExpr(var={}, start={}, end={}, step={}, body={})", varName, s, e, s1, b);
     }
+
+    llvm::Value *ForExpr::generateIR() const {
+        // codegen start value
+        auto start_code = start->generateIR();
+        if (!start_code) return nullptr;
+
+        // Get pre-loop block
+        auto pre_entry_block = Builder().GetInsertBlock();
+
+        // Get parent function
+        auto func = pre_entry_block->getParent();
+
+        // Create loop block
+        auto loop_block = llvm::BasicBlock::Create(Context(), "loop", func);
+
+        // Create fall through pre-entry block to loop block
+        Builder().CreateBr(loop_block);
+
+        // Set insert point to loop block to put instructions there
+        Builder().SetInsertPoint(loop_block);
+
+        // Create PHI node
+        // As loop block can come from pre-entry block as well as itself
+        auto variable = Builder().CreatePHI(DoubleType(), 2, varName);
+        variable->addIncoming(start_code, pre_entry_block);
+
+        // Add loop variable to symbol table
+        // Save the existing if any
+        auto existing_value = NamedValues()[varName];
+        NamedValues()[varName] = variable;
+
+        // codegen body expression
+        // We don't have to assign it to a variable because it's not needed
+        // and insert point is already points to loop block
+        if (!body->generateIR()) return nullptr;
+
+        // codegen step value
+        // If there isn't one (since it's optional), set it to default value of 1
+        llvm::Value *step_code;
+        if (step) {
+            step_code = step->generateIR();
+            if (!step_code) return nullptr;
+        } else {
+            step_code = NumberExpr(1.0).generateIR();
+        }
+
+        auto next_variable = Builder().CreateFAdd(variable, step_code, "next_" + varName);
+
+        // codegen end condition
+        auto end_code = end->generateIR();
+        if (!end_code) return nullptr;
+
+        // convert end condition to bool by comparing non-equal to 0.0
+        end_code = Builder().CreateFCmpONE(end_code, NumberExpr(0.0).generateIR(), "loop_cond");
+
+        // create after loop block
+        auto loop_end_block = Builder().GetInsertBlock();
+        auto after_loop_block = llvm::BasicBlock::Create(Context(), "after_loop", func);
+
+        // create conditional branch based on end code
+        // If true, go back to loop block, otherwise, go to after loop block
+        Builder().CreateCondBr(end_code, loop_block, after_loop_block);
+
+        // Set insert point to after block so any new code will go there
+        Builder().SetInsertPoint(after_loop_block);
+
+        // Add next variable as the second entry of PHI node
+        variable->addIncoming(next_variable, loop_end_block);
+
+        // Restore existing variable saved earlier
+        if (existing_value) NamedValues()[varName] = existing_value;
+        else NamedValues().erase(varName);
+
+        // Set return value for for-loop
+        // For now, it is set to default of 0.0
+        return NumberExpr(0.0).generateIR();
+    }
 }
