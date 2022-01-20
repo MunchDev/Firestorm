@@ -126,3 +126,9 @@ _deps
 *.iml
 out
 gen
+
+### LLVM files
+# LLVM IR files
+*.ll
+# Bitcode files
+*.bc
