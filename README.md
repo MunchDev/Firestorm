@@ -3,6 +3,9 @@
 Firestorm is a proof-of-concept programming language created to empower users
 to implement the language themselves.
 
+__Status__: The project is currently on pause as I just started school, I hope
+that I can return to this project when I'm freee!
+
 ## Features
 
 - `Firestorm` contains minimal amount of elements to be Turing-complete, while
